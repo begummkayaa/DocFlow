@@ -322,7 +322,7 @@ def search_database(query):
     all_rows = cursor.fetchall()
     
     scored_results = []
-    banned_terms = ["prof.", "doç.", "öğr.", "dr.", "yazar", "editör", "türkçe:"]
+    banned_terms = ["prof.", "doç.", "öğr.", "dr.", "yazar", "editör", "türkçe:", "önsöz", "i̇çindekiler"] # Yasaklı kelimelere önsözü de ekledik!
     
     for row_id, content in all_rows:
         content_lower = content.lower()
