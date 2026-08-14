@@ -75,6 +75,8 @@ pip install -r requirements.txt
 streamlit run app.py
 Terminalde beliren http://localhost:8501 adresine giderek DocFlow'u kullanmaya başlayabilirsiniz.
 
+---
+
 ## 💡 Kullanım Senaryosu
 Sol menüdeki sürükle-bırak alanına analiz edilmesini istediğiniz PDF veya TXT dosyasını yükleyin.
 
@@ -84,10 +86,16 @@ Sayfanın alt kısmındaki şık sohbet kutusuna dokümanla ilgili spesifik bir 
 
 Arkanıza yaslanın ve DocFlow'un dosyalarınızın derinliklerinden çıkardığı en doğru cevabı okuyun!
 
+---
+
 ## 🏢 Geliştirici ve Proje Hakkında
 Bu proje, Mega Yazılım bünyesinde gerçekleştirilen yazılım mühendisliği stajı kapsamında Berfin Aslan tarafından geliştirilmiştir.
 
 Projenin temel motivasyonu; kurumsal firmaların veri güvenliği kaygılarını ortadan kaldıran, hafif, hızlı ve yüksek UX (Kullanıcı Deneyimi) standartlarına sahip bir yerel yapay zeka SaaS prototipi ortaya koymaktır.
 
+---
+
 ## 📄 Lisans
 Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için LICENSE dosyasına göz atabilirsiniz. Dilediğiniz gibi kullanabilir, değiştirebilir ve kendi projelerinize entegre edebilirsiniz.
+
+---
