@@ -64,11 +64,15 @@ Proje bağımlılıklarının sisteminizle çakışmaması için yalıtılmış 
 python -m venv venv
 ```
 
-# Windows için aktif etme:
+### Windows için aktif etme:
+```bash
 venv\Scripts\activate
+```
 
-# macOS/Linux için aktif etme:
+### macOS/Linux için aktif etme:
+```bash
 source venv/bin/activate
+```
 
 ### 3. Gerekli Bağımlılıkları Yükleyin
 ```bash
