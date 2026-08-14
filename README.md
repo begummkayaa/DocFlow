@@ -106,6 +106,6 @@ Projenin temel motivasyonu; kurumsal firmaların veri güvenliği kaygılarını
 ---
 
 ## 📄 Lisans
-Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için LICENSE dosyasına göz atabilirsiniz. Dilediğiniz gibi kullanabilir, değiştirebilir ve kendi projelerinize entegre edebilirsiniz.
+Bu proje MIT Lisansı altında lisanslanmıştır. Dilediğiniz gibi kullanabilir, değiştirebilir ve kendi projelerinize entegre edebilirsiniz.
 
 ---
