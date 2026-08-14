@@ -99,7 +99,7 @@ Arkanıza yaslanın ve DocFlow'un dosyalarınızın derinliklerinden çıkardı�
 ---
 
 ## 🏢 Geliştirici ve Proje Hakkında
-Bu proje, Mega Yazılım bünyesinde gerçekleştirilen yazılım mühendisliği stajı kapsamında Berfin Aslan tarafından geliştirilmiştir.
+Bu proje, Microsoft Türkiye bünyesinde düzenlenen AI Innovators Summer Internship kapsamında Begüm Kaya tarafından geliştirilmiştir.
 
 Projenin temel motivasyonu; kurumsal firmaların veri güvenliği kaygılarını ortadan kaldıran, hafif, hızlı ve yüksek UX (Kullanıcı Deneyimi) standartlarına sahip bir yerel yapay zeka SaaS prototipi ortaya koymaktır.
 
