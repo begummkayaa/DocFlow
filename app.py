@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. ÖZEL CSS: Ultra Premium "DocFlow" Tasarımı (Zarif Metin & Kesin Butonsuz)
+# 2. ÖZEL CSS
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -47,7 +47,6 @@ st.markdown("""
             box-shadow: 0 0 20px rgba(129, 140, 248, 0.4) !important;
         }
 
-        /* --- YENİ DOSYA YÜKLEME ALANI --- */
         [data-testid="stFileUploadDropzone"],
         [data-testid="stFileUploaderDropzone"] {
             border: 2px dashed #1e293b !important; 
@@ -67,7 +66,6 @@ st.markdown("""
             background-color: rgba(59, 130, 246, 0.05) !important;
         }
 
-        /* İNATÇI UPLOAD BUTONUNA KESİN ÇÖZÜM: Kökten Yok Et! */
         [data-testid="stFileUploadDropzone"] button,
         [data-testid="stFileUploaderDropzone"] button {
             display: none !important;
@@ -81,13 +79,11 @@ st.markdown("""
             padding: 0 !important;
         }
         
-        /* Orijinal her şeyi gizle */
         [data-testid="stFileUploadDropzone"] > div > *,
         [data-testid="stFileUploaderDropzone"] > div > * {
             display: none !important;
         }
         
-        /* Satır aralığı */
         [data-testid="stFileUploadDropzone"] > div,
         [data-testid="stFileUploaderDropzone"] > div {
             display: flex !important;
@@ -96,7 +92,6 @@ st.markdown("""
             gap: 12px !important; 
         }
 
-        /* Yuvarlak arka planlı ikon */
         [data-testid="stFileUploadDropzone"]::before,
         [data-testid="stFileUploaderDropzone"]::before {
             content: '📄';
@@ -112,7 +107,6 @@ st.markdown("""
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* 1. Satır: Ana Metin */
         [data-testid="stFileUploadDropzone"] > div::before,
         [data-testid="stFileUploaderDropzone"] > div::before {
             content: 'Belgenizi Buraya Sürükleyin veya Dosya Seçin';
@@ -122,7 +116,6 @@ st.markdown("""
             text-align: center;
         }
 
-        /* 2. Satır: Desteklenen Formatlar */
         [data-testid="stFileUploadDropzone"] > div::after,
         [data-testid="stFileUploaderDropzone"] > div::after {
             content: 'Desteklenen formatlar: PDF, TXT';
@@ -131,7 +124,6 @@ st.markdown("""
             font-weight: 400; 
             text-align: center;
         }
-        /* ---------------------------------------------------- */
 
         .hero-container {
             text-align: center;
@@ -201,7 +193,6 @@ st.markdown("""
             line-height: 1.5;
         }
 
-        /* --- SOHBET GİRİŞ KUTUSU (KIRMIZI HATAYI MAVİYE ÇEVİRDİK) --- */
         [data-testid="stChatInput"] {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
@@ -210,19 +201,16 @@ st.markdown("""
             transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
         }
         
-        /* Üzerine gelince veya tıklanınca o sinir bozucu kırmızı yerine şık neon mavi olur */
         [data-testid="stChatInput"]:hover,
         [data-testid="stChatInput"]:focus-within {
             border-color: #38bdf8 !important;
             box-shadow: 0 0 12px rgba(56, 189, 248, 0.15), 0 4px 20px rgba(0, 0, 0, 0.3) !important;
         }
 
-        /* İçindeki varsayılan çizgiyi garantiye almak için sıfırlıyoruz */
         [data-testid="stChatInput"] textarea:focus {
             outline: none !important;
             box-shadow: none !important;
         }
-        /* ----------------------------------------------------------- */
 
         .disclaimer-text {
             text-align: center;
@@ -233,7 +221,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. SDK ve Model Başlatma (Singleton Hatası Korumalı)
+# 3. SDK ve Model Başlatma (Güvenli ve Kararlı CPU/Default Mod)
 @st.cache_resource
 def init_model():
     try:
@@ -292,12 +280,29 @@ def process_and_save_file(uploaded_file):
         with open(file_path, "r", encoding="utf-8") as f:
             file_text = f.read()
     elif uploaded_file.name.endswith(".pdf"):
-        file_text = extract_text_from_pdf(file_path)
+        doc = fitz.open(file_path)
+        start_page = 2 if len(doc) > 3 else 0
+        for page_num in range(start_page, len(doc)):
+            file_text += doc[page_num].get_text() + "\n"
         
     if file_text:
         conn = sqlite3.connect("rag_database.db")
         cursor = conn.cursor()
-        chunks = [chunk.strip() for chunk in file_text.split(".") if len(chunk.strip()) > 10]
+        
+        chunk_size = 1000
+        overlap = 200
+        chunks = []
+        
+        banned_titles = ["doç.dr", "öğr.gör", "prof.dr", "dr.öğr", "yazar", "editör", "türkçe:", "prof."]
+        
+        for i in range(0, len(file_text), chunk_size - overlap):
+            chunk = file_text[i:i + chunk_size].strip()
+            chunk_clean = chunk.lower().replace(" ", "")
+            
+            # İçinde unvan geçen parçaları veritabanına asla kaydetme
+            if len(chunk) > 50 and not any(title in chunk_clean for title in banned_titles):
+                chunks.append(chunk)
+                
         for chunk in chunks:
             cursor.execute("INSERT INTO documents (source_file, content) VALUES (?, ?)", (uploaded_file.name, chunk))
         conn.commit()
@@ -305,62 +310,42 @@ def process_and_save_file(uploaded_file):
         return len(chunks)
     return 0
 
-# Akıllı Arama: Gereksiz kelimeleri eler, sadece teknik terimlerle arama yapar
+# Arama Fonksiyonu
 def search_database(query):
     conn = sqlite3.connect("rag_database.db")
     cursor = conn.cursor()
     
-    stop_words = {"neden", "nasıl", "niçin", "için", "gibi", "genelde", "çalışır", "kullanmaz", "veya", "bunun", "olan", "her", "aynı", "anda", "farklı", "göre", "nokta", "daha", "önce", "ayıran", "karşı", "özelliği", "olarak", "anlama", "gelir"}
-    keywords = [kw.strip("?,.!'\"") for kw in query.split() if len(kw) > 3 and kw.lower() not in stop_words]
+    stop_words = {"neden", "nasıl", "niçin", "için", "gibi", "genelde", "çalışır", "kullanmaz", "veya", "bunun", "olan", "her", "aynı", "anda", "farklı", "göre", "nokta", "daha", "önce", "ayıran", "karşı", "özelliği", "olarak", "anlama", "gelir", "nedir", "nedir?"}
+    keywords = [kw.strip("?,.!'\"") for kw in query.split() if len(kw) > 2 and kw.lower() not in stop_words]
     
-    results = []
-    for kw in keywords:
-        cursor.execute("SELECT content FROM documents WHERE content LIKE ?", ('%' + kw + '%',))
-        rows = cursor.fetchall()
-        for r in rows:
-            if r[0] not in results:
-                results.append(r[0])
-    conn.close()
-    return "\n".join(results[:2])
-
-# NİHAİ TEMİZLEYİCİ: Kelime salatası veya anlamsız girişleri engelleyen kalkan
-def clean_and_validate(text, fallback_context):
-    if not text:
-        return fallback_context.split(".")[0] + "." if fallback_context else "Bilgi bulunamadı."
+    cursor.execute("SELECT id, content FROM documents")
+    all_rows = cursor.fetchall()
     
-    # Sohbet ve yarım giriş kalıntılarını temizle
-    bad_prefixes = ["özür dilerim", "merhaba", "ben buradayım", "lütfen", "bu soruda", "bu nedenle:", "daha önce", "sctp protokolü tcp'ın"]
-    clean_text = text.strip()
-    for prefix in bad_prefixes:
-        if clean_text.lower().startswith(prefix):
-            parts = re.split(r'[.!?]\s+', clean_text, maxsplit=1)
-            if len(parts) > 1:
-                clean_text = parts[1].strip()
-
-    raw_sentences = re.split(r'(?<!\b\d)(?<=[.!?])\s+', clean_text)
+    scored_results = []
+    banned_terms = ["prof.", "doç.", "öğr.", "dr.", "yazar", "editör", "türkçe:"]
     
-    valid_sentences = []
-    for s in raw_sentences:
-        s_clean = s.strip()
-        # Halüsinasyon kelimelerini barındıran veya bozulmuş cümleleri ele
-        if len(s_clean) > 15 and s_clean not in valid_sentences:
-            if not re.search(r'\b(\w+)\s+(?:ve\s+)?\1\b', s_clean, re.IGNORECASE):
-                valid_sentences.append(s_clean)
+    for row_id, content in all_rows:
+        content_lower = content.lower()
+        if any(term in content_lower for term in banned_terms):
+            continue
+            
+        score = 0
+        for kw in keywords:
+            if kw.lower() in content_lower:
+                score += 1
                 
-    final_result = " ".join(valid_sentences[:2]).strip()
+        if score > 0:
+            scored_results.append((score, content))
+            
+    scored_results.sort(key=lambda x: x[0], reverse=True)
+    conn.close()
     
-    # EĞER MODEL YİNE "aynı zamana" GİBİ SAÇMALADIYSA VERİTABANINDAKİ TEMİZ BİLGİYİ VER:
-    bad_words = ["aynı zamana", "sınırlamakta", "erken", "ayrıntılı", "konut"]
-    if not final_result or any(bw in final_result.lower() for bw in bad_words):
-        if fallback_context:
-            first_clean_chunk = fallback_context.split("\n")[0].strip()
-            return first_clean_chunk if first_clean_chunk.endswith(".") else first_clean_chunk + "."
-        return "Multi-Homing, bir endpoint'in birden fazla IP adresine sahip olması sayesinde ağ hatalarına karşı dayanıklılık sağlar ve alternatif yol üzerinden iletişime devam edilmesine imkan tanır."
-        
-    if not final_result.endswith((".", "!", "?")):
-        final_result += "."
-        
-    return final_result
+    unique_results = []
+    for score, content in scored_results:
+        if content not in unique_results:
+            unique_results.append(content)
+            
+    return unique_results[0] if unique_results else ""
 
 # 6. Sidebar
 with st.sidebar:
@@ -392,6 +377,11 @@ with st.sidebar:
         if st.button("Kaynak Yükle", use_container_width=True):
             with st.spinner("Dosyalar taranıyor ve veritabanına işleniyor..."):
                 total_added = 0
+                # Yeni veride eski unvanlar kalmasın diye önce db dosyasını sıfırlayalım
+                if os.path.exists("rag_database.db"):
+                    os.remove("rag_database.db")
+                init_db()
+                
                 for file in uploaded_files:
                     count = process_and_save_file(file)
                     total_added += count
@@ -441,15 +431,13 @@ if user_query := st.chat_input("Yerel verileriniz hakkında bir şeyler sorun...
             if not context_data:
                 response_text = "Yüklediğiniz belgelerde bu soruyla ilgili bir bilgi bulamadım."
             else:
-                # Modele asla giriş cümlesi kurmamasını ve soruyu tekrar etmemesini emrediyoruz
                 messages_payload = [
                     {
                         "role": "system",
                         "content": (
-                            "Sen yüklenen belgelere göre çalışan teknik bir asistansın. "
-                            "Kullanıcının sorusunu SADECE verilen bilgi bağlamına dayanarak yanıtla. "
-                            "Sadece cevabı yaz, hiçbir ön söz veya etiket ekleme. "
-                            "Doğrudan net, akıcı ve anlaşılır bir Türkçe ile 2-3 cümlelik açıklama yap."
+                            "Sen yalnızca sana verilen 'Bilgi Bağlamı' içindeki metne sadık kalan akademik bir asistansın. "
+                            "Kural 1: Asla 'Prof.', 'Doç.', 'Türkçe:' gibi unvanlar veya etiketler kullanma. "
+                            "Kural 2: Kendi kendine sohbet etme, rol yapma, soruya doğrudan net ve açıklayıcı bir cümleyle yanıt ver."
                         )
                     },
                     {
@@ -459,9 +447,7 @@ if user_query := st.chat_input("Yerel verileriniz hakkında bir şeyler sorun...
                 ]
                 
                 response = chat_client.complete_chat(messages_payload)
-                raw_text = response.choices[0].message.content.strip()
-                
-                response_text = clean_and_validate(raw_text, context_data)
+                response_text = response.choices[0].message.content.strip()
 
             st.markdown(response_text)
             st.session_state.messages.append({"role": "assistant", "content": response_text})
