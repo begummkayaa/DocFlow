@@ -56,11 +56,13 @@ Projeyi kendi bilgisayarınızda (Windows, macOS veya Linux) çalıştırmak iç
 ```bash
 git clone [https://github.com/KULLANICI_ADIN/DocFlow.git](https://github.com/KULLANICI_ADIN/DocFlow.git)
 cd DocFlow
+```
 
 ### 2. Sanal Ortam (Virtual Environment) Oluşturun
 Proje bağımlılıklarının sisteminizle çakışmaması için yalıtılmış bir ortam oluşturun.
-
+```bash
 python -m venv venv
+```
 
 # Windows için aktif etme:
 venv\Scripts\activate
@@ -69,10 +71,14 @@ venv\Scripts\activate
 source venv/bin/activate
 
 ### 3. Gerekli Bağımlılıkları Yükleyin
+```bash
 pip install -r requirements.txt
+```
 
 ### 4. Uygulamayı Başlatın
+```bash
 streamlit run app.py
+```
 Terminalde beliren http://localhost:8501 adresine giderek DocFlow'u kullanmaya başlayabilirsiniz.
 
 ---
