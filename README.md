@@ -1,6 +1,6 @@
 # 🌊 DocFlow: Offline RAG-Based Document Assistant
 
-![DocFlow Arayüzü](buraya_projenin_harika_ekran_goruntusunun_linkini_koy)
+!![DocFlow Arayüz](arayuz.png)
 
 **DocFlow**, yapay zeka gücünü buluta ihtiyaç duymadan tamamen yerel (offline) makinenizde çalıştıran, veri gizliliği odaklı ve RAG (Retrieval-Augmented Generation) mimarisiyle inşa edilmiş modern bir belge asistanıdır. Yüzlerce sayfalık PDF veya TXT dosyalarınızı saniyeler içinde analiz eder, içeriği bağlamsal olarak anlar ve sorularınızı yalnızca sizin belgelerinizdeki kanıtlara dayanarak yanıtlar.
 
