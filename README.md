@@ -88,13 +88,13 @@ Terminalde beliren http://localhost:8501 adresine giderek DocFlow'u kullanmaya b
 ---
 
 ## 💡 Kullanım Senaryosu
-Sol menüdeki sürükle-bırak alanına analiz edilmesini istediğiniz PDF veya TXT dosyasını yükleyin.
+- Sol menüdeki sürükle-bırak alanına analiz edilmesini istediğiniz PDF veya TXT dosyasını yükleyin.
 
-"Kaynak Yükle" butonuna basın ve verilerin saniyeler içinde SQLite veritabanına işlenmesini bekleyin.
+- "Kaynak Yükle" butonuna basın ve verilerin saniyeler içinde SQLite veritabanına işlenmesini bekleyin.
 
-Sayfanın alt kısmındaki şık sohbet kutusuna dokümanla ilgili spesifik bir soru sorun.
+- Sayfanın alt kısmındaki şık sohbet kutusuna dokümanla ilgili spesifik bir soru sorun.
 
-Arkanıza yaslanın ve DocFlow'un dosyalarınızın derinliklerinden çıkardığı en doğru cevabı okuyun!
+- Arkanıza yaslanın ve DocFlow'un dosyalarınızın derinliklerinden çıkardığı en doğru cevabı okuyun!
 
 ---
 
